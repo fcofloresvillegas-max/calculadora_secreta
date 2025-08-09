@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Calculadora de Puntos Baremo</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      background-color: #f9f9f9;
+    }
+    label {
+      display: block;
+      margin: 10px 0 5px;
+    }
+    input, select {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 15px;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .resultado {
+      font-weight: bold;
+      margin-top: 20px;
+      background: #e6ffe6;
+      padding: 10px;
+      border-radius: 5px;
+    }
+    .nota {
+      margin-top: 20px;
+      padding: 10px;
+      background-color: #fff3cd;
+      border-left: 4px solid #ffeeba;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Calculadora de Puntos Baremo</h2>
+
+  <label>¿Reutiliza el DROP?</label>
+  <select id="drop">
+    <option value="no">No</option>
+    <option value="si">Sí</option>
+  </select>
+
+  <label>¿Instala Banda Ancha?</label>
+  <select id="ba">
+    <option value="si">Sí</option>
+    <option value="no">No</option>
+  </select>
+
+  <label>¿Instala Voz?</label>
+  <select id="voz">
+    <option value="si">Sí</option>
+    <option value="no">No</option>
+  </select>
+
+  <label>¿Instala TV?</label>
+  <select id="tv">
+    <option value="si">Sí</option>
+    <option value="no">No</option>
+  </select>
+
+  <label>Alta N-Líneas</label>
+  <select id="lineas">
+    <option value="0">Ninguna</option>
+    <option value="2">2 Líneas</option>
+    <option value="4">4 Líneas</option>
+    <option value="8">8 Líneas</option>
+  </select>
+
+  <label>Decos adicionales normales</label>
+  <input type="number" id="decos" value="0" min="0">
+
+  <label>Decos adicionales Wi-Fi</label>
+  <input type="number" id="decosWifi" value="0" min="0">
+
+  <label>Access Point normal</label>
+  <input type="number" id="ap" value="0" min="0">
+
+  <label>Access Point Wi-Fi</label>
+  <input type="number" id="apWifi" value="0" min="0">
+
+  <label>Precio por punto ($)</label>
+  <input type="number" id="precio" value="1000">
+
+  <button onclick="calcular()">Calcular</button>
+
+  <div class="resultado" id="resultado"></div>
+
+  <div class="nota">
+    <strong>Nota:</strong> Las Rutinas son pagadas a 1,5pb y las variaciones van en 0 pb, ya que se carga el equipo a la petición original.
+  </div>
+
+<script>
+  async function calcular() {
+    // Recoge todos los datos del formulario
+    const datos = {
+      drop: document.getElementById('drop').value,
+      ba: document.getElementById('ba').value,
+      voz: document.getElementById('voz').value,
+      tv: document.getElementById('tv').value,
+      lineas: document.getElementById('lineas').value,
+      decos: document.getElementById('decos').value,
+      decosWifi: document.getElementById('decosWifi').value,
+      ap: document.getElementById('ap').value,
+      apWifi: document.getElementById('apWifi').value,
+      precio: document.getElementById('precio').value
+    };
+
+    // Envía los datos al backend secreto
+    const respuesta = await fetch('/.netlify/functions/calcular', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(datos)
+    });
+    
+    const resultado = await respuesta.json();
+    
+    // Muestra el resultado
+    document.getElementById('resultado').innerHTML = `
+      Total puntos baremo: <strong>${resultado.puntos.toFixed(2)}</strong><br>
+      Pago estimado: <strong>$${resultado.totalPago.toLocaleString()}</strong>
+    `;
+  }
+</script>
+</body>
+</html>
